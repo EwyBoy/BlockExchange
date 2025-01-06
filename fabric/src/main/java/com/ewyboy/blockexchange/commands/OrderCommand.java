@@ -23,18 +23,18 @@ import java.time.LocalDateTime;
 public class OrderCommand {
 
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher,commandBuildContext, dedicated) ->
+        CommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext, dedicated) ->
                 dispatcher.register(Commands.literal("exchange")
-                .then(Commands.literal("buy")
-                        .then(Commands.argument("item", ItemArgument.item(commandBuildContext))
-                                .then(Commands.argument("quantity", IntegerArgumentType.integer())
-                                        .then(Commands.argument("price", DoubleArgumentType.doubleArg())
-                                                .executes(context -> placeOrder(context, OrderTypes.BUY))))))
-                .then(Commands.literal("sell")
-                        .then(Commands.argument("item", ItemArgument.item(commandBuildContext))
-                                .then(Commands.argument("quantity", IntegerArgumentType.integer())
-                                        .then(Commands.argument("price", DoubleArgumentType.doubleArg())
-                                                .executes(context -> placeOrder(context, OrderTypes.SELL))))))));
+                        .then(Commands.literal("buy")
+                                .then(Commands.argument("item", ItemArgument.item(commandBuildContext))
+                                        .then(Commands.argument("quantity", IntegerArgumentType.integer())
+                                                .then(Commands.argument("price", DoubleArgumentType.doubleArg())
+                                                        .executes(context -> placeOrder(context, OrderTypes.BUY))))))
+                        .then(Commands.literal("sell")
+                                .then(Commands.argument("item", ItemArgument.item(commandBuildContext))
+                                        .then(Commands.argument("quantity", IntegerArgumentType.integer())
+                                                .then(Commands.argument("price", DoubleArgumentType.doubleArg())
+                                                        .executes(context -> placeOrder(context, OrderTypes.SELL))))))));
     }
 
     private static int placeOrder(CommandContext<CommandSourceStack> context, OrderTypes orderType) {
@@ -55,7 +55,6 @@ public class OrderCommand {
         ItemService itemService = new ItemService();
 
         DBOrder order = new DBOrder();
-
         LocalDateTime now = LocalDateTime.now();
 
         order.setPlayer(playerService.getPlayerByUUID(player.getUUID()));
@@ -71,12 +70,12 @@ public class OrderCommand {
         databaseService.saveOrUpdateEntity(order);
 
         context.getSource().sendSystemMessage(
-                Component.literal(String.format("Successfully placed %s order for %dx %s at %.2f",
-                orderType.toString(), quantity, itemInput.getItem(), price))
+                Component.literal(
+                        String.format("Successfully placed %s order for %dx %s at %.2f",
+                                orderType.toString(), quantity, itemInput.getItem(), price
+                        )
+                )
         );
-
-        // send success message
-        System.out.println("Order placed successfully");
 
         return 1;
     }
