@@ -1,9 +1,16 @@
 <hibernate-configuration>
     <session-factory>
+        <!-- Database Props -->
         <property name="hibernate.connection.driver_class">org.sqlite.JDBC</property>
-        <property name="hibernate.connection.url">jdbc:sqlite:auction_house.db</property>
+        <property name="hibernate.connection.url">jdbc:sqlite:block_exchange.db</property>
         <property name="hibernate.dialect">org.hibernate.community.dialect.SQLiteDialect</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.show_sql">true</property>
+
+        <!-- Database Mappings -->
+        <mapping class="com.ewyboy.blockexchange.database.entities.DBPlayer"/>
+        <mapping class="com.ewyboy.blockexchange.database.entities.DBItem"/>
+        <mapping class="com.ewyboy.blockexchange.database.entities.DBOrder"/>
+        <mapping class="com.ewyboy.blockexchange.database.entities.DBTransaction"/>
     </session-factory>
 </hibernate-configuration>

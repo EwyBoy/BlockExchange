@@ -1,6 +1,5 @@
-package com.ewyboy.auctionhouse.database;
+package com.ewyboy.blockexchange.database;
 
-import com.ewyboy.auctionhouse.sql.Auction;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
@@ -12,8 +11,8 @@ public class HibernateUtil {
         try {
             return new Configuration()
                     .configure()
-                    .addAnnotatedClass(Auction.class)
                     .buildSessionFactory();
+
         } catch (Throwable ex) {
             throw new ExceptionInInitializerError(ex);
         }

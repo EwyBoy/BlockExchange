@@ -1,5 +1,7 @@
 package com.ewyboy.blockexchange;
 
+import com.ewyboy.blockexchange.database.DatabaseService;
+import com.ewyboy.blockexchange.database.entities.DBItem;
 import com.ewyboy.blockexchange.platform.Services;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Items;
@@ -25,5 +27,18 @@ public class CommonClass {
         if (Services.PLATFORM.isModLoaded("blockexchange")) {
             Constants.LOG.info("Hello to blockexchange");
         }
+
+        DatabaseService databaseService = new DatabaseService();
+
+        BuiltInRegistries.ITEM.forEach(item -> {
+            DBItem DBItemEntity = new DBItem();
+
+            DBItemEntity.setNamespace(BuiltInRegistries.ITEM.getKey(item).getNamespace());
+            DBItemEntity.setPath(BuiltInRegistries.ITEM.getKey(item).getPath());
+            DBItemEntity.setResourceLocation(BuiltInRegistries.ITEM.getKey(item).toString());
+
+            databaseService.saveOrUpdateEntity(DBItemEntity);
+        });
+
     }
 }

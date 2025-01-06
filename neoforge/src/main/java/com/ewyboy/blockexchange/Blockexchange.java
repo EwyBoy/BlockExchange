@@ -1,8 +1,9 @@
 package com.ewyboy.blockexchange;
 
-
+import com.ewyboy.blockexchange.events.PlayerEventHandler;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 @Mod(Constants.MOD_ID)
 public class Blockexchange {
@@ -15,5 +16,7 @@ public class Blockexchange {
         // Use NeoForge to bootstrap the Common mod.
         Constants.LOG.info("Hello NeoForge world!");
         CommonClass.init();
+
+        eventBus.register(PlayerEvent.PlayerLoggedInEvent.class);
     }
 }

@@ -1,5 +1,7 @@
 package com.ewyboy.blockexchange;
 
+import com.ewyboy.blockexchange.commands.OrderCommand;
+import com.ewyboy.blockexchange.events.PlayerEventHandler;
 import net.fabricmc.api.ModInitializer;
 
 public class Blockexchange implements ModInitializer {
@@ -14,5 +16,8 @@ public class Blockexchange implements ModInitializer {
         // Use Fabric to bootstrap the Common mod.
         Constants.LOG.info("Hello Fabric world!");
         CommonClass.init();
+
+        PlayerEventHandler.register();
+        OrderCommand.register();
     }
 }

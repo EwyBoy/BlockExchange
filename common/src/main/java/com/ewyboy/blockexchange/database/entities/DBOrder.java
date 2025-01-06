@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
-public class Order {
+public class DBOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,28 +16,28 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "player_id", nullable = false)
-    private Player player;
+    private DBPlayer player;
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    private DBItem DBItem;
+    private DBItem item;
 
     @Column(name = "order_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderTypes orderType;
+    private OrderTypes orderType = OrderTypes.BUY;
 
     @Column(name = "order_state", nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderState orderState;
+    private OrderState orderState = OrderState.OPEN;
 
     @Column(nullable = false)
-    private int amount;
+    private int amount = 1;
 
     @Column(name = "price_per_item", nullable = false)
     private double pricePerItem;
 
     @Column(name = "fulfilled_quantity", nullable = false)
-    private int fulfilledQuantity;
+    private int fulfilledQuantity = 0;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -53,20 +53,20 @@ public class Order {
         this.id = id;
     }
 
-    public Player getPlayer() {
+    public DBPlayer getPlayer() {
         return player;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public void setPlayer(DBPlayer DBPlayer) {
+        this.player = DBPlayer;
     }
 
     public DBItem getItem() {
-        return DBItem;
+        return item;
     }
 
     public void setItem(DBItem DBItem) {
-        this.DBItem = DBItem;
+        this.item = DBItem;
     }
 
     public OrderTypes getOrderType() {
