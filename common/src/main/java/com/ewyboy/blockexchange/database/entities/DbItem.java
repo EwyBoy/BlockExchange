@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "items")
-public class DBItem {
+public class DbItem {
 
     @Id
     @Column(name = "resource_location", nullable = false, unique = true)

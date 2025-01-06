@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "players")
-public class DBPlayer {
+public class DbPlayer {
 
     @Id
     @Column(nullable = false, unique = true)

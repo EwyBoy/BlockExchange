@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "orders")
-public class DBOrder {
+public class DbOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,11 +16,11 @@ public class DBOrder {
 
     @ManyToOne
     @JoinColumn(name = "player_id", nullable = false)
-    private DBPlayer player;
+    private DbPlayer player;
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    private DBItem item;
+    private DbItem item;
 
     @Column(name = "order_type", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -53,19 +53,19 @@ public class DBOrder {
         this.id = id;
     }
 
-    public DBPlayer getPlayer() {
+    public DbPlayer getPlayer() {
         return player;
     }
 
-    public void setPlayer(DBPlayer DBPlayer) {
+    public void setPlayer(DbPlayer DBPlayer) {
         this.player = DBPlayer;
     }
 
-    public DBItem getItem() {
+    public DbItem getItem() {
         return item;
     }
 
-    public void setItem(DBItem DBItem) {
+    public void setItem(DbItem DBItem) {
         this.item = DBItem;
     }
 

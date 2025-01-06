@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "transactions")
-public class DBTransaction {
+public class DbTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,15 +14,15 @@ public class DBTransaction {
 
     @ManyToOne
     @JoinColumn(name = "buy_order_id", nullable = false)
-    private DBOrder buyOrder;
+    private DbOrder buyOrder;
 
     @ManyToOne
     @JoinColumn(name = "sell_order_id", nullable = false)
-    private DBOrder sellOrder;
+    private DbOrder sellOrder;
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
-    private DBItem DBItem;
+    private DbItem DBItem;
 
     @Column(nullable = false)
     private int quantity;
@@ -41,27 +41,27 @@ public class DBTransaction {
         this.id = id;
     }
 
-    public DBOrder getBuyOrder() {
+    public DbOrder getBuyOrder() {
         return buyOrder;
     }
 
-    public void setBuyOrder(DBOrder buyDBOrder) {
-        this.buyOrder = buyDBOrder;
+    public void setBuyOrder(DbOrder buyDbOrder) {
+        this.buyOrder = buyDbOrder;
     }
 
-    public DBOrder getSellOrder() {
+    public DbOrder getSellOrder() {
         return sellOrder;
     }
 
-    public void setSellOrder(DBOrder sellDBOrder) {
-        this.sellOrder = sellDBOrder;
+    public void setSellOrder(DbOrder sellDbOrder) {
+        this.sellOrder = sellDbOrder;
     }
 
-    public DBItem getItem() {
+    public DbItem getItem() {
         return DBItem;
     }
 
-    public void setItem(DBItem DBItem) {
+    public void setItem(DbItem DBItem) {
         this.DBItem = DBItem;
     }
 

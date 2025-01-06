@@ -1,11 +1,12 @@
 package com.ewyboy.blockexchange.commands;
 
-import com.ewyboy.blockexchange.database.DatabaseService;
-import com.ewyboy.blockexchange.database.ItemService;
-import com.ewyboy.blockexchange.database.PlayerService;
-import com.ewyboy.blockexchange.database.entities.DBOrder;
+import com.ewyboy.blockexchange.database.services.DatabaseService;
+import com.ewyboy.blockexchange.database.entities.DbItem;
+import com.ewyboy.blockexchange.database.entities.DbOrder;
+import com.ewyboy.blockexchange.database.entities.DbPlayer;
 import com.ewyboy.blockexchange.database.enums.OrderState;
 import com.ewyboy.blockexchange.database.enums.OrderTypes;
+import com.ewyboy.blockexchange.database.services.DatabaseServiceRegistry;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -50,24 +51,23 @@ public class OrderCommand {
         int quantity = context.getArgument("quantity", Integer.class);
         double price = context.getArgument("price", Double.class);
 
-        DatabaseService databaseService = new DatabaseService();
-        PlayerService playerService = new PlayerService();
-        ItemService itemService = new ItemService();
+        DatabaseService<DbOrder> orderService = DatabaseServiceRegistry.getService(DbOrder.class);
+        DatabaseService<DbPlayer> playerService = DatabaseServiceRegistry.getService(DbPlayer.class);
+        DatabaseService<DbItem> itemService = DatabaseServiceRegistry.getService(DbItem.class);
 
-        DBOrder order = new DBOrder();
-        LocalDateTime now = LocalDateTime.now();
+        DbOrder order = new DbOrder();
 
-        order.setPlayer(playerService.getPlayerByUUID(player.getUUID()));
-        order.setItem(itemService.getItem(itemInput.getItem().toString()));
+        order.setPlayer(playerService.findById(player.getUUID()));
+        order.setItem(itemService.findById(itemInput.getItem().toString()));
         order.setAmount(quantity);
         order.setPricePerItem(price);
         order.setOrderType(orderType);
         order.setOrderState(OrderState.OPEN);
         order.setFulfilledQuantity(0);
-        order.setCreatedAt(now);
-        order.setUpdatedAt(now);
+        order.setCreatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now());
 
-        databaseService.saveOrUpdateEntity(order);
+        orderService.saveOrUpdate(order);
 
         context.getSource().sendSystemMessage(
                 Component.literal(
