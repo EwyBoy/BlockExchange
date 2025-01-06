@@ -17,6 +17,9 @@
   "entrypoints": {
     "main": [
       "com.ewyboy.blockexchange.Blockexchange"
+    ],
+    "client": [
+      "com.ewyboy.blockexchange.BlockexchangeClient"
     ]
   },
   "mixins": [

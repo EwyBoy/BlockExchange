@@ -3,9 +3,11 @@ package com.ewyboy.blockexchange.database.services;
 import com.ewyboy.blockexchange.database.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class DatabaseService<T> {
 
@@ -71,6 +73,23 @@ public class DatabaseService<T> {
             session.close();
         }
     }
+
+    public List<T> runQuery(String query, Consumer<Query<T>> parameterSetter) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            Query<T> hqlQuery = session.createQuery(query, entityType);
+
+            // Apply parameter setter if provided
+            if (parameterSetter != null) {
+                parameterSetter.accept(hqlQuery);
+            }
+
+            return hqlQuery.getResultList();
+        } finally {
+            session.close();
+        }
+    }
+
 
     public void delete(T entity) {
         Session session = HibernateUtil.getSessionFactory().openSession();

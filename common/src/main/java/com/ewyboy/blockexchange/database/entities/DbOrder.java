@@ -124,4 +124,5 @@ public class DbOrder {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }

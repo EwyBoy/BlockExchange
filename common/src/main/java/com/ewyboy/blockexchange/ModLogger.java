@@ -10,9 +10,7 @@ public class ModLogger {
     private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_NAME);
 
     public static void info(String message, Object... args) {
-        if (IS_DEV_ENV) {
-            LOGGER.info(message, args);
-        }
+        LOGGER.info(message, args);
     }
 
     public static void warn(String message, Object... args) {
@@ -24,15 +22,11 @@ public class ModLogger {
     }
 
     public static void debug(String message, Object... args) {
-        if (IS_DEV_ENV) {
-            LOGGER.debug(message, args);
-        }
+        LOGGER.debug(message, args);
     }
 
     public static void trace(String message, Object... args) {
-        if (IS_DEV_ENV) {
-            LOGGER.trace(message, args);
-        }
+        LOGGER.trace(message, args);
     }
 
     public static boolean isDevelopment() {
