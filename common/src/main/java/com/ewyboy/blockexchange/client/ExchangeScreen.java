@@ -1,9 +1,9 @@
 package com.ewyboy.blockexchange.client;
 
 import com.ewyboy.blockexchange.database.entities.DbItem;
-import com.ewyboy.blockexchange.database.entities.DbOrder;
 import com.ewyboy.blockexchange.database.services.DatabaseService;
 import com.ewyboy.blockexchange.helpers.IntCounter;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -14,13 +14,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.List;
 
 public class ExchangeScreen extends Screen {
 
-    private List<DbOrder> orders = null;
     private List<DbItem> items = null;
-    private EditBox searchBox = null;
+    private int scrollOffset = 0;
+    private int maxScroll = 0;
+    private DbItem hoveredItem = null;
+    private EditBox searchBox;
 
     public ExchangeScreen(Component component) {
         super(component);
@@ -28,56 +31,126 @@ public class ExchangeScreen extends Screen {
 
     @Override
     protected void init() {
-        DatabaseService<DbOrder> dbOrderService = new DatabaseService<>(DbOrder.class);
-        orders = dbOrderService.findAll();
+        DatabaseService<DbItem> itemService = new DatabaseService<>(DbItem.class);
+        items = itemService.findAll();
 
-        // Create an edit box as a search bar
-        searchBox = new EditBox(font, width / 2 - 100, 20, 200, 20, Component.literal("Search..."));
-        searchBox.setMaxLength(100);
+        int searchBoxWidth = (int) (width * 0.4);
+        searchBox = new EditBox(font, width / 2 - searchBoxWidth / 2, 20, searchBoxWidth, 20, Component.literal("Search..."));
+        searchBox.setMaxLength(128);
+        searchBox.setFocused(false);
         addRenderableWidget(searchBox);
 
         searchBox.setResponder(value -> {
             if (value == null || value.isEmpty()) {
-                orders = dbOrderService.findAll();
+                items = itemService.findAll();
             } else {
-                orders = dbOrderService.runQuery(
-                        "SELECT o FROM DbOrder o WHERE o.item.id IN (SELECT i.id FROM DbItem i WHERE i.path LIKE :path)",
-                        query -> query.setParameter("path", "%" + value + "%"
-                ));
+                items = itemService.runQuery(
+                        "SELECT o FROM DbItem o WHERE o.path LIKE :path",
+                        query -> query.setParameter("path", "%" + value + "%")
+                );
             }
+            calculateMaxScroll();
         });
+
+        calculateMaxScroll();
+    }
+
+    private void calculateMaxScroll() {
+        int rows = (items.size() + getItemsPerRow() - 1) / getItemsPerRow();
+        int visibleRows = (height - 100) / 20;
+        maxScroll = Math.max(0, (rows - visibleRows) * 20);
+    }
+
+    private int getItemsPerRow() {
+        return Math.max(1, (width - 100) / 20);
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pScrollX, double pScrollY) {
+        scrollOffset = (int) Math.max(0, Math.min(scrollOffset - pScrollY * 20, maxScroll));
+        return true;
+    }
+
+    @Override
+    public void mouseMoved(double pMouseX, double pMouseY) {
+        hoveredItem = null;
+
+        int padding = 50;
+        int xOffset = padding + 10;
+        int yOffset = padding + 10 - scrollOffset;
+
+        IntCounter x = new IntCounter(xOffset, 20);
+        IntCounter y = new IntCounter(yOffset, 20);
+
+        for (DbItem dbItem : items) {
+            if (pMouseX >= x.getValue() && pMouseX <= x.getValue() + 16 &&
+                    pMouseY >= y.getValue() && pMouseY <= y.getValue() + 16) {
+                hoveredItem = dbItem;
+                break;
+            }
+            x.increment();
+            if (x.getValue() >= width - padding - 20) {
+                x.setValue(xOffset);
+                y.increment();
+            }
+        }
+    }
+
+    @Override
+    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+        if (searchBox != null) {
+            if (pKeyCode != InputConstants.KEY_ESCAPE) {
+                if (searchBox.isFocused()) {
+                    return searchBox.keyPressed(pKeyCode, pScanCode, pModifiers);
+                } else {
+                    searchBox.setFocused(true);
+                    return true;
+                }
+            }
+        }
+
+        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
     }
 
     @Override
     public void renderBackground(@NotNull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.renderBackground(graphics, pMouseX, pMouseY, pPartialTick);
 
-        // draw a pink border
-        graphics.fill(45, 45, width - 45, height - 45, 0xFFFF00FF);
+        int padding = 50;
+        graphics.fill(padding - 5, padding - 5, width - padding + 5, height - padding + 5, Color.GREEN.hashCode());
+        graphics.fill(padding, padding, width - padding, height - padding, 0xFF000000);
 
-        // draw a black background
-        graphics.fill(50, 50, width - 50, height - 50, 0xFF000000);
-
-        // Render the background of the screen
         graphics.drawCenteredString(font, "Block Exchange", width / 2, 10, 0xFFFFFF);
 
-        IntCounter y = new IntCounter(50, 10);
+        if (items == null || items.isEmpty()) {
+            graphics.drawCenteredString(font, "No items found", width / 2, height / 2, 0xAAAAAA);
+            return;
+        }
 
-        // filter orders by the search bar
-        orders.forEach(order -> {
-            DbItem dbItem = order.getItem();
-            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(dbItem.getNamespace(), dbItem.getPath());
-            Item item = BuiltInRegistries.ITEM.get(resourceLocation);
+        graphics.fill(padding, padding, width - padding, padding + 20, 0xFF000000);
 
-            // get the name of the player who created the order
-            String playerName = order.getPlayer().getUsername();
-            String orderText = order.getOrderType().name() + " " + order.getAmount() + " " + item.getDescription().getString() + " for " + order.getPricePerItem() + " from " + playerName;
+        int xOffset = padding + 10;
+        int yOffset = padding + 10 - scrollOffset;
 
-            graphics.renderItem(new ItemStack(item, order.getAmount()), 60, y.getValue());
-            graphics.drawString(font, Component.literal(orderText), 60 + 20, y.getValue() + 5, 0xFFFFFF);
+        IntCounter x = new IntCounter(xOffset, 20);
+        IntCounter y = new IntCounter(yOffset, 20);
 
-            y.add(20);
+        items.forEach(dbItem -> {
+            if (y.getValue() >= padding && y.getValue() <= height - padding) {
+                ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(dbItem.getNamespace(), dbItem.getPath());
+                Item item = BuiltInRegistries.ITEM.get(resourceLocation);
+                graphics.renderItem(new ItemStack(item), x.getValue(), y.getValue());
+            }
+
+            x.increment();
+            if (x.getValue() >= width - padding - 20) {
+                x.setValue(xOffset);
+                y.increment();
+            }
         });
-    }
 
+        if (hoveredItem != null) {
+            graphics.drawString(font, hoveredItem.getPath(), pMouseX + 10, pMouseY - 10, 0xFFFFFF);
+        }
+    }
 }

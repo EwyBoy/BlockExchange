@@ -15,9 +15,8 @@ public class IntCounter {
         this.incrementer = incrementer;
     }
 
-    public IntCounter count() {
+    public void increment() {
         this.value += this.incrementer;
-        return this;
     }
 
     public int getValue() {
