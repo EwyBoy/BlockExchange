@@ -3,7 +3,6 @@ package com.ewyboy.blockexchange.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Consumer;
@@ -25,7 +24,7 @@ public class KeyMappingHandler {
         }
 
         if (openExchangeScreen.consumeClick()) {
-            minecraft.setScreen(new ExchangeScreen(Component.literal("Block Exchange")));
+            minecraft.setScreen(new ExchangeBrowseScreen());
         }
     }
 
